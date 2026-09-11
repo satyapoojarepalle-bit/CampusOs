@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   ArrowUpRight,
@@ -281,10 +281,17 @@ export default function Home() {
   }, [year]);
 
   useEffect(() => { window.localStorage.setItem("campus-lost-items", JSON.stringify(lostData)); }, [lostData]);
-  useEffect(() => {
-    setAssignments(makeAssignments(department, year));
-    setDayItems(makeSchedule(department, year));
-  }, [department, year]);
+ const profileInitialized = useRef(false);
+
+useEffect(() => {
+  if (!profileInitialized.current) {
+    profileInitialized.current = true;
+    return;
+  }
+
+  setAssignments(makeAssignments(department, year));
+  setDayItems(makeSchedule(department, year));
+}, [department, year]);
   useEffect(() => { const interval = window.setInterval(() => setNow(new Date()), 1000); return () => window.clearInterval(interval); }, []);
 
   useEffect(() => {
