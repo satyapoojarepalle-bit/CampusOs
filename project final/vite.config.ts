@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "node:path";
-import { defineConfig, type Plugin, type ViteDevServer } from "vite";
+import { defineConfig, loadEnv, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
 // =============================================================================
@@ -203,10 +203,26 @@ function vitePluginStorageProxy(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
+function vitePluginAnalytics(env: Record<string, string>): Plugin {
+  return {
+    name: "optional-analytics",
+    transformIndexHtml(html) {
+      const endpoint = env.VITE_ANALYTICS_ENDPOINT?.replace(/\/+$/, "");
+      const websiteId = env.VITE_ANALYTICS_WEBSITE_ID;
+      const script = endpoint && websiteId
+        ? `    <script defer src="${endpoint}/umami" data-website-id="${websiteId}"></script>\n`
+        : "";
 
-export default defineConfig({
-  plugins,
+      return html.replace("    __OPTIONAL_ANALYTICS_SCRIPT__\n", script);
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, PROJECT_ROOT, "");
+
+  return {
+  plugins: [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginAnalytics(env), vitePluginStorageProxy()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -238,4 +254,5 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
+  };
 });
