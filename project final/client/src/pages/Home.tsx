@@ -15,6 +15,7 @@ import {
   FileText,
   Filter,
   Flame,
+  Github,
   GraduationCap,
   Heart,
   Home as HomeIcon,
@@ -419,6 +420,7 @@ useEffect(() => {
           <div className="breadcrumb"><span>CampusOS</span><ChevronRight size={14} /><strong>{currentNav?.label}</strong></div>
           <div className="top-actions">
             <span className="current-time" aria-label="Current time">{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+            <a className="icon-button github-link" href="https://github.com" target="_blank" rel="noreferrer" aria-label="Open GitHub"><Github size={19} /></a>
             <button className="icon-button notification" aria-label="Notifications" onClick={() => { setShowNotifications(true); setNotificationsRead(true); }}><Bell size={19} />{!notificationsRead && <i />}</button>
             <button className="mini-avatar" aria-label="Open profile" onClick={() => setShowProfile(true)}>{initialsFor(studentName)}</button>
           </div>
